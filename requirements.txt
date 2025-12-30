@@ -1,8 +1,24 @@
+# DO NOT use: pip install -r requirements.txt
+# Use: bash install.sh
+#
+# This file pins versions for reference only.
+# flash-attn requires torch first and --no-build-isolation flag.
+
+--extra-index-url https://download.pytorch.org/whl/cu129
 torch==2.8.0+cu129
 transformers==4.56.1
 triton==3.4.0
-flash-attn==2.7.4.post1
 xxhash==3.6.0
 numpy==2.3.4
 tqdm==4.67.1
 safetensors==0.6.2
+huggingface_hub==0.35.0
+flask==3.1.1
+
+# flash-attn build dependencies
+psutil
+ninja
+packaging
+
+# flash-attn (install with: pip install flash-attn --no-build-isolation)
+flash-attn==2.7.4.post1

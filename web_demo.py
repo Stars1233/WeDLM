@@ -34,7 +34,7 @@ def parse_args():
         help="Path to the model directory",
     )
     parser.add_argument("--host", type=str, default="0.0.0.0", help="Server host")
-    parser.add_argument("--port", type=int, default=8081, help="Server port")
+    parser.add_argument("--port", type=int, default=8080, help="Server port")
     return parser.parse_args()
 # ==================== Configuration ====================
 # Default WeDLM decoding parameters

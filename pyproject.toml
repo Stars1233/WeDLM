@@ -39,14 +39,20 @@ dependencies = [
     "torch>=2.1.0",
     "transformers>=4.40.0",
     "triton>=3.0.0",
-    "flash-attn>=2.5.0",
+    # flash-attn build dependencies (flash-attn itself requires install.sh)
+    "psutil",
+    "ninja",
+    "packaging",
     "xxhash>=3.0.0",
     "numpy>=1.24.0",
     "tqdm>=4.60.0",
     "safetensors>=0.4.0",
+    "flask>=2.0.0",
 ]
 
 [project.optional-dependencies]
+# flash-attn must be installed separately with --no-build-isolation
+flash = ["flash-attn>=2.5.0"]
 dev = [
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
@@ -54,17 +60,24 @@ dev = [
     "isort>=5.12.0",
     "flake8>=6.0.0",
 ]
-web = [
-    "flask>=2.0.0",
-]
 
 [project.urls]
-Homepage = "https://github.com/xxx/WeDLM"
-Repository = "https://github.com/xxx/WeDLM"
-Documentation = "https://github.com/xxx/WeDLM#readme"
+Homepage = "wedlm.github.io"
+Repository = "https://github.com/tencent/WeDLM"
+Documentation = "https://github.com/tencent/WeDLM#readme"
 
 [tool.setuptools]
-packages = ["wedlm", "wedlm.engine", "wedlm.layers", "wedlm.models", "wedlm.utils"]
+
+[tool.setuptools.packages.find]
+include = ["wedlm*"]
+exclude = [
+    "data*",
+    "evaluation*",
+    "hf_compat*",
+    "images*",
+    "output*",
+    "tests*",
+]
 
 [tool.setuptools.package-data]
 wedlm = ["py.typed"]

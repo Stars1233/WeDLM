@@ -55,7 +55,24 @@ class Config:
     nccl_port: int = 2333
 
     def __post_init__(self):
-        assert os.path.isdir(self.model), f"Model path {self.model} is not a directory."
+        # HuggingFace model id support:
+        # - If `model` is a local directory, it will be used directly.
+        # - If `model` is a HF repo id (e.g. "org/name" or "gpt2"), it will be
+        #   downloaded to local cache and then loaded from the downloaded directory.
+        # - Cache dir, revision, and token can be configured via environment variables
+        #   (HF_HOME, HF_HUB_CACHE, HF_TOKEN, etc.)
+        if not os.path.isdir(self.model):
+            try:
+                from huggingface_hub import snapshot_download
+            except ImportError as e:
+                raise ImportError(
+                    "huggingface_hub is required to use remote HuggingFace model ids. "
+                    "Install it with: pip install huggingface_hub"
+                ) from e
+
+            # Download snapshot to local cache and replace `model` with the local directory.
+            self.model = snapshot_download(repo_id=self.model)
+
         assert self.kvcache_block_size % 256 == 0, (
             "kvcache_block_size must be divisible by 256."
         )
