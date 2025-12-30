@@ -44,8 +44,6 @@ class WeDLMState:
     window_mask_flags: List[bool]
     # Current sequence length committed to KV cache (excluding window tokens)
     current_seq_len: int
-    # Remaining KV budget
-    kv_budget: int
     # Whether generation is finished
     is_finished: bool = False
     # Whether initialized (window needs initialization before first forward)
@@ -57,7 +55,6 @@ class WeDLMState:
             self.window_tokens,
             self.window_mask_flags,
             self.current_seq_len,
-            self.kv_budget,
             self.is_finished,
             self.is_initialized,
         )
@@ -71,9 +68,8 @@ class WeDLMState:
             window_tokens=data[0],
             window_mask_flags=data[1],
             current_seq_len=data[2],
-            kv_budget=data[3],
-            is_finished=data[4],
-            is_initialized=data[5],
+            is_finished=data[3],
+            is_initialized=data[4],
         )
 
 

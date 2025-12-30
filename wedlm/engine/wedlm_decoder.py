@@ -121,7 +121,6 @@ class WeDLMDecoder:
             window_tokens=[self.mask_token_id] * initial_window_size,
             window_mask_flags=[True] * initial_window_size,
             current_seq_len=len(seq),
-            kv_budget=seq.kv_budget,
             is_finished=False,
             is_initialized=True,
         )
@@ -180,7 +179,7 @@ class WeDLMDecoder:
         prefix_len = mask_indices[0] if mask_indices else len(state.window_tokens)
 
         if prefix_len > 0:
-            refill_count = min(prefix_len, state.kv_budget)
+            refill_count = min(prefix_len, seq.kv_budget)
             if refill_count > 0:
                 state.window_tokens = (
                     state.window_tokens + [self.mask_token_id] * refill_count
@@ -361,7 +360,6 @@ class WeDLMDecoder:
             is_stop_token = t in seq.stop_token_ids
 
             state.current_seq_len += 1
-            state.kv_budget -= 1
 
             if is_stop_token:
                 state.is_finished = True
