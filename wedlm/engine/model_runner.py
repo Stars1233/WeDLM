@@ -29,6 +29,7 @@ Responsibilities:
 """
 
 import pickle
+import logging
 import torch
 import torch.distributed as dist
 from multiprocessing.synchronize import Event
@@ -42,6 +43,9 @@ from wedlm.engine.wedlm_decoder import WeDLMDecoder
 from wedlm.models.wedlm import WeDLMForDiffusionLM
 from wedlm.utils.context import set_context, get_context, reset_context
 from wedlm.utils.loader import load_model
+
+
+logger = logging.getLogger(__name__)
 
 
 class ModelRunner:
@@ -97,7 +101,7 @@ class ModelRunner:
     def _init_model(self, hf_config):
         """Initialize and load model along with the sampler."""
         default_dtype = torch.get_default_dtype()
-        torch.set_default_dtype(hf_config.torch_dtype)
+        torch.set_default_dtype(hf_config.dtype)
         torch.set_default_device("cuda")
 
         self.model = WeDLMForDiffusionLM(hf_config)
@@ -230,7 +234,7 @@ class ModelRunner:
             * self.block_size
             * num_kv_heads
             * head_dim
-            * hf_config.torch_dtype.itemsize
+            * hf_config.dtype.itemsize
         )
         
         # Allocate cache
@@ -238,7 +242,12 @@ class ModelRunner:
             int(total * config.gpu_memory_utilization - used - peak + current)
             // block_bytes
         )
-        assert config.num_kvcache_blocks > 0
+        if config.num_kvcache_blocks <= 0:
+            logger.warning(
+                f"num_kvcache_blocks ({config.num_kvcache_blocks}) is <= 0. "
+                "Setting it to 1."
+            )
+        config.num_kvcache_blocks = max(config.num_kvcache_blocks, 1)
         
         self.kv_cache = torch.empty(
             2,
